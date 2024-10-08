@@ -2,7 +2,6 @@ package replace
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -27,21 +26,52 @@ func replace() {
 	}
 
 	// 正規表現のパターンを定義
-	materials := regexp.MustCompile(`\d+,\w+,[A-Z0-9]+,.+?,\d+,\d+,\w+,"(.+?)",\w+,,,taxable,,(\d+),,,(\d+),(\d+),,,,,(\d+),,,,(\d+),"(.*?)",,,,"(.*?)",,,`)
+	// desc := regexp.MustCompile(`.*?,.*?,.*?,.*?,.*?,.*?,.*?,"(.+?)",.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,`)
+	materials := regexp.MustCompile(`.*?\n素材(.*?)\n`)
+	size := regexp.MustCompile(`.*?\nサイズ(.*?)\n`)
+	madein := regexp.MustCompile(`.*?\n製造国(.*?)\n`)
+	brand := regexp.MustCompile(`.*?\nブランド.*?\n(.*?)\n`)
+	Pcode := regexp.MustCompile(`.*?\n独自商品コード.*?\n(.*?)\n`)
 
 	// 各レコード（行）に対して正規表現を適用して変換する
 	for i, record := range records {
 		if len(record) > 0 {
-			input := record[0] // CSVの1行を文字列として取得
+			description := record[8] // CSVの1行を文字列として取得
 
-			output := materials.ReplaceAllString(input, ``)
+			// description := desc.FindString(input)
+			attr_materials := materials.FindString(description)
+			attr_size := size.FindString(description)
+			attr_madein := madein.FindString(description)
+			attr_brand := brand.FindString(description)
+			attr_Pcode := Pcode.FindString(description)
 
-			// 結果を出力（または他の処理に利用）
-			fmt.Printf("変換前: %s\n", input)
-			fmt.Printf("変換後: %s\n", output)
+			if attr_materials != "" {
+				record[0] = "素材"
+				record[1] = attr_materials
+			}
+
+			if attr_size != "" {
+				record[0] = "サイズ"
+				record[1] = attr_size
+			}
+
+			if attr_madein != "" {
+				record[0] = "製造国"
+				record[1] = attr_madein
+			}
+
+			if attr_brand != "" {
+				record[0] = "ブランド"
+				record[1] = attr_brand
+			}
+
+			if attr_Pcode != "" {
+				record[0] = "独自商品コード"
+				record[1] = attr_Pcode
+			}
 
 			// 変換結果をレコードに書き戻す
-			records[i][0] = output
+			records[i] = record
 		}
 	}
 
