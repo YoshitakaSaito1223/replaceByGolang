@@ -1,4 +1,4 @@
-package replace
+package main
 
 import (
 	"encoding/csv"
@@ -7,9 +7,9 @@ import (
 	"regexp"
 )
 
-func replace() {
+func main() {
 	// 入力CSVファイルを開く
-	file, err := os.Open("input.csv")
+	file, err := os.Open("pre.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,48 +26,56 @@ func replace() {
 	}
 
 	// 正規表現のパターンを定義
-	// desc := regexp.MustCompile(`.*?,.*?,.*?,.*?,.*?,.*?,.*?,"(.+?)",.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,`)
-	materials := regexp.MustCompile(`.*?\n素材(.*?)\n`)
-	size := regexp.MustCompile(`.*?\nサイズ(.*?)\n`)
-	madein := regexp.MustCompile(`.*?\n製造国(.*?)\n`)
-	brand := regexp.MustCompile(`.*?\nブランド.*?\n(.*?)\n`)
-	Pcode := regexp.MustCompile(`.*?\n独自商品コード.*?\n(.*?)\n`)
+	materials := regexp.MustCompile(`.*?\\n素材 (.*?)\n`)
+	size := regexp.MustCompile(`.*?\\nサイズ (.*?)\n`)
+	madein := regexp.MustCompile(`.*?\\n製造国 (.*?)\n`)
+	brand := regexp.MustCompile(`.*?\\nブランド.*?\n\\n(.*?)\n`)
+	Pcode := regexp.MustCompile(`.*?\\n独自商品コード\n\\n(.*?)"`)
 
-	// 各レコード（行）に対して正規表現を適用して変換する
+	// 各レコードに対して正規表現を適用して変換する
 	for i, record := range records {
 		if len(record) > 0 {
-			description := record[8] // CSVの1行を文字列として取得
+			description := record[7] // 商品詳細部分取得
 
-			// description := desc.FindString(input)
-			attr_materials := materials.FindString(description)
-			attr_size := size.FindString(description)
-			attr_madein := madein.FindString(description)
-			attr_brand := brand.FindString(description)
-			attr_Pcode := Pcode.FindString(description)
+			attr_materials := materials.FindStringSubmatch(description)
+			attr_size := size.FindStringSubmatch(description)
+			attr_madein := madein.FindStringSubmatch(description)
+			attr_brand := brand.FindStringSubmatch(description)
+			attr_Pcode := Pcode.FindStringSubmatch(description)
 
-			if attr_materials != "" {
-				record[0] = "素材"
-				record[1] = attr_materials
+			if len(attr_materials) > 1 {
+				record[39] = "素材"
+				record[40] = attr_materials[1]
+				record[41] = "1"
+				record[42] = "0"
 			}
 
-			if attr_size != "" {
-				record[0] = "サイズ"
-				record[1] = attr_size
+			if len(attr_size) > 1 {
+				record[63] = "サイズ"
+				record[64] = attr_size[1]
+				record[65] = "1"
+				record[66] = "0"
 			}
 
-			if attr_madein != "" {
-				record[0] = "製造国"
-				record[1] = attr_madein
+			if len(attr_madein) > 1 {
+				record[67] = "製造国"
+				record[68] = attr_madein[1]
+				record[69] = "1"
+				record[70] = "0"
 			}
 
-			if attr_brand != "" {
-				record[0] = "ブランド"
-				record[1] = attr_brand
+			if len(attr_brand) > 1 {
+				record[71] = "ブランド"
+				record[72] = attr_brand[1]
+				record[73] = "1"
+				record[74] = "0"
 			}
 
-			if attr_Pcode != "" {
-				record[0] = "独自商品コード"
-				record[1] = attr_Pcode
+			if len(attr_Pcode) > 1 {
+				record[75] = "独自商品コード"
+				record[76] = attr_Pcode[1]
+				record[77] = "1"
+				record[78] = "0"
 			}
 
 			// 変換結果をレコードに書き戻す
