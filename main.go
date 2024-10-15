@@ -25,16 +25,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// fmt.Print(records[4310])
+
 	// 正規表現のパターンを定義
-	materials := regexp.MustCompile(`.*?\\n素材 (.*?)\n`)
-	size := regexp.MustCompile(`.*?\\nサイズ (.*?)\n`)
-	madein := regexp.MustCompile(`.*?\\n製造国 (.*?)\n`)
-	brand := regexp.MustCompile(`.*?\\nブランド.*?\n\\n(.*?)\n`)
-	Pcode := regexp.MustCompile(`.*?\\n独自商品コード\n\\n(.*?)"`)
+	materials := regexp.MustCompile(`.*?\\n素材 (.*?)\\n`)
+	size := regexp.MustCompile(`.*?\\nサイズ (.*?)\\n`)
+	madein := regexp.MustCompile(`.*?\\n製造国 (.*?)\\n`)
+	brand := regexp.MustCompile(`.*?\\nブランド.*?\\n(.*?)\\n`)
+	Pcode := regexp.MustCompile(`.*?\\n独自商品コード\\n(.*?)$`)
 
 	// 各レコードに対して正規表現を適用して変換する
 	for i, record := range records {
-		if len(record) > 0 {
+		if len(record) > 6 {
 			description := record[7] // 商品詳細部分取得
 
 			attr_materials := materials.FindStringSubmatch(description)
@@ -43,43 +45,44 @@ func main() {
 			attr_brand := brand.FindStringSubmatch(description)
 			attr_Pcode := Pcode.FindStringSubmatch(description)
 
+			new_record := record[:]
 			if len(attr_materials) > 1 {
-				record[39] = "素材"
-				record[40] = attr_materials[1]
-				record[41] = "1"
-				record[42] = "0"
+				new_record[39] = "素材"
+				new_record[40] = attr_materials[1]
+				new_record[41] = "1"
+				new_record[42] = "0"
+			} else {
+				new_record[39] = ""
+				new_record[40] = ""
+				new_record[41] = ""
+				new_record[42] = ""
 			}
 
 			if len(attr_size) > 1 {
-				record[63] = "サイズ"
-				record[64] = attr_size[1]
-				record[65] = "1"
-				record[66] = "0"
+				new_record = append(new_record, "サイズ", attr_size[1], "1", "0")
+			} else {
+				new_record = append(new_record, "", "", "", "")
 			}
 
 			if len(attr_madein) > 1 {
-				record[67] = "製造国"
-				record[68] = attr_madein[1]
-				record[69] = "1"
-				record[70] = "0"
+				new_record = append(new_record, "製造国", attr_madein[1], "1", "0")
+			} else {
+				new_record = append(new_record, "", "", "", "")
 			}
 
 			if len(attr_brand) > 1 {
-				record[71] = "ブランド"
-				record[72] = attr_brand[1]
-				record[73] = "1"
-				record[74] = "0"
+				new_record = append(new_record, "ブランド", attr_brand[1], "1", "0")
+			} else {
+				new_record = append(new_record, "", "", "", "")
 			}
 
 			if len(attr_Pcode) > 1 {
-				record[75] = "独自商品コード"
-				record[76] = attr_Pcode[1]
-				record[77] = "1"
-				record[78] = "0"
+				new_record = append(new_record, "独自商品コード", attr_Pcode[1], "1", "0")
+			} else {
+				new_record = append(new_record, "", "", "", "")
 			}
-
 			// 変換結果をレコードに書き戻す
-			records[i] = record
+			records[i] = new_record
 		}
 	}
 
