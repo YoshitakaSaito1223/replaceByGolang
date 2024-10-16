@@ -1,8 +1,36 @@
 function replace_attributes() {
+  // 対象のスプレッドシートを取得
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getActiveSheet();
+
+  // CA列のインデックスを取得
+  var caColumnIndex = sheet.getRange("CA1").getColumn();
+
+  // CA列の右側に12列挿入
+  sheet.insertColumnsAfter(caColumnIndex, 12);
+
+  // 挿入した列の1行目に文字列をセット
+  var range = sheet.getRange(1, caColumnIndex + 1, 1, 12);
+  var values = [
+    "属性 3 の名前",
+    "属性 6 の値",
+    "属性 6 を表示",
+    "属性 6 のグローバル",
+    "属性 7 の名前",
+    "属性 7 の値",
+    "属性 7 を表示",
+    "属性 7 のグローバル",
+    "属性 8 の名前",
+    "属性 8 の値",
+    "属性 8 を表示",
+    "属性 8 のグローバル",
+  ];
+  range.setValues([values]);
+
   // フォルダIDとファイル名
   let folderId = "1Z_IMqrabPeStrsqV-X8mGH18ai3-FQJIBmwU3E_OtY4";
-  let fileName = "wc-product-export-7-10-2024-1728281447083.csv";
-  let sheetName = "wc-product-export-7-10-2024-1728281447083";
+  let fileName = "wc-product.csv";
+  let sheetName = "wc-product";
 
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   var lastRow = sheet.getLastRow();
@@ -85,7 +113,7 @@ function replace_attributes() {
   let attr4_col = getColumnIndex("BT") + 1; //サイズ or 全長
   let attr5_col = getColumnIndex("BX") + 1; //モチーフサイズ
   let attr6_col = getColumnIndex("CB") + 1; //製造国
-  let attr7_col = attr6_col + 4 ; //ブランド
+  let attr7_col = attr6_col + 4; //ブランド
   let attr8_col = attr7_col + 4; //独自商品コード
   let attr_array = [
     attr1_col,
@@ -125,8 +153,8 @@ function replace_attributes() {
           .setValue(match_array[j][1]);
         sheet.getRange(i + 1, attr_array[attr_count] + 2).setValue("1");
         sheet.getRange(i + 1, attr_array[attr_count] + 3).setValue("0");
-        var value = value.replace(regex_array[j][1], "$1");
-        sheet.getRange(i + 1, disc+1).setValue(value);
+        var value = value.replace(regex_array[j][1], "");
+        sheet.getRange(i + 1, disc + 1).setValue(value);
         attr_count++;
       }
     }
