@@ -12,7 +12,7 @@ function replace_attributes() {
   // 挿入した列の1行目に文字列をセット
   var range = sheet.getRange(1, caColumnIndex + 1, 1, 12);
   var values = [
-    "属性 3 の名前",
+    "属性 6 の名前",
     "属性 6 の値",
     "属性 6 を表示",
     "属性 6 のグローバル",
