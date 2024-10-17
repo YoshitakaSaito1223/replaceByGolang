@@ -1,4 +1,10 @@
 function replace_attributes() {
+  // フォルダIDとファイル名
+  const sheetName = "wc-product";
+
+  //////////////////////////　列追加　start　///////////////////////////////
+  // 追加行数
+  const addRowCount = 16;
   // 対象のスプレッドシートを取得
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getActiveSheet();
@@ -7,10 +13,10 @@ function replace_attributes() {
   var caColumnIndex = sheet.getRange("CA1").getColumn();
 
   // CA列の右側に12列挿入
-  sheet.insertColumnsAfter(caColumnIndex, 12);
+  sheet.insertColumnsAfter(caColumnIndex, addRowCount);
 
   // 挿入した列の1行目に文字列をセット
-  var range = sheet.getRange(1, caColumnIndex + 1, 1, 12);
+  var range = sheet.getRange(1, caColumnIndex + 1, 1, addRowCount);
   var values = [
     "属性 6 の名前",
     "属性 6 の値",
@@ -24,14 +30,15 @@ function replace_attributes() {
     "属性 8 の値",
     "属性 8 を表示",
     "属性 8 のグローバル",
+    "属性 9 の名前",
+    "属性 9 の値",
+    "属性 9 を表示",
+    "属性 9 のグローバル",
   ];
   range.setValues([values]);
+  //////////////////////////　列追加　end　///////////////////////////////
 
-  // フォルダIDとファイル名
-  let folderId = "1Z_IMqrabPeStrsqV-X8mGH18ai3-FQJIBmwU3E_OtY4";
-  let fileName = "wc-product.csv";
-  let sheetName = "wc-product";
-
+  // シート内容を取得
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   var lastRow = sheet.getLastRow();
   var lastColumn = sheet.getLastColumn();
@@ -106,13 +113,13 @@ function replace_attributes() {
   ];
 
   //各属性の列 //大体の要素
-  let disc = getColumnIndex("H");
-  let attr1_col = getColumnIndex("AN") + 1; //素材
-  let attr2_col = getColumnIndex("BL") + 1; //ダイヤ or チェーン幅
-  let attr3_col = getColumnIndex("BP") + 1; //中石グレード
-  let attr4_col = getColumnIndex("BT") + 1; //サイズ or 全長
-  let attr5_col = getColumnIndex("BX") + 1; //モチーフサイズ
-  let attr6_col = getColumnIndex("CB") + 1; //製造国
+  let disc = getColumnIndex("H"); //簡単な説明
+  let attr1_col = getColumnIndex("BL") + 1; //素材
+  let attr2_col = attr1_col + 4; //ダイヤ or チェーン幅
+  let attr3_col = attr2_col + 4; //中石グレード
+  let attr4_col = attr3_col + 4; //サイズ or 全長
+  let attr5_col = attr4_col + 4; //モチーフサイズ
+  let attr6_col = attr5_col + 4; //製造国
   let attr7_col = attr6_col + 4; //ブランド
   let attr8_col = attr7_col + 4; //独自商品コード
   let attr_array = [
@@ -139,7 +146,7 @@ function replace_attributes() {
     var match_array = [];
 
     for (let n = 0; n < regex_array.length; n++) {
-      var match_array = [...match_array, value.match(regex_array[n][1])];
+      match_array = [...match_array, value.match(regex_array[n][1])];
     }
 
     var attr_count = 0;
@@ -162,7 +169,7 @@ function replace_attributes() {
 }
 
 function getColumnIndex(columnName) {
-  var range = SpreadsheetApp.getActiveSpreadsheet().getRange(
+  let range = SpreadsheetApp.getActiveSpreadsheet().getRange(
     "A1:" + columnName + "1"
   );
   return range.getLastColumn() - 1;
